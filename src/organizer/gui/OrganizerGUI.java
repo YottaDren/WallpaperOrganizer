@@ -1,5 +1,6 @@
 package organizer.gui;
 
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -11,6 +12,7 @@ import javax.swing.ListSelectionModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 /**
  * The GUI for the organizer.
  * 
@@ -54,10 +56,20 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 		    // Category Panel - EAST: CENTER
 		    //////////////////////////////////////////////////////////////////////
 
-	    //create the JList
-	    String[] initialList = {"This", "Is", "Where", "Categories", "Go"};
-	    // TODO: Read categories from data.dat
-	    JList<String> listContainer = new JList<String>(initialList);
+	    // create the JList
+	    // TODO: Make this prettier
+	    DefaultListModel<String> listModel = new DefaultListModel<String>();
+	    if(model.getCategoryList().isEmpty()){
+	    	String[] initialList = {"This", "Is", "Where", "Categories", "Go"};
+	    	for(String s : initialList){
+	    		listModel.addElement(s);
+	    	}
+	    } else {
+	    	for(String s : model.getCategoryList()){
+	    		listModel.addElement(s);
+	    	}
+	    }
+	    JList<String> listContainer = new JList<String>(listModel);
 	    listContainer.setFixedCellWidth(EAST_SIZE);
 	    listContainer.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 

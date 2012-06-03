@@ -5,9 +5,12 @@ import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * A simple image organizer.
@@ -17,24 +20,46 @@ import java.util.Vector;
  */
 public class OrganizerModel {
 
-	Vector<File> fileList = new Vector<File>();
-	Vector<String> categoryList = new Vector<String>(); 
-	Vector<Integer> startingNumbers = new Vector<Integer>();
+	// List of files in the current directory
+	ArrayList<File> fileList = new ArrayList<File>();
+	// List of categories (also folders)
+	ArrayList<String> categoryList = new ArrayList<String>();
+	// Everything goes into a folder and gets the name in the folder plus a space
+	// plus a number
+	ArrayList<Integer> startingNumbers = new ArrayList<Integer>();
 	File directory;
+	// Where all the files will me renamed and copied to.
 	File directoryOut;
+	// What category is chosen for that file
 	String[] categoryPairs;
+	// which file in the file list
 	int place = 0;
 	
 	/**
 	 * Build the model and initialize it to the user's pictures directory
 	 */
 	public OrganizerModel() {
-		System.out.println("Inside OrganizerModel()");
 		directory = new File(System.getProperty("user.home")
 				+ System.getProperty("file.separator")
 				+ "Pictures"
 			);
-		
+		// Populate the file list
+		if(directory.isDirectory()){
+			fileList = new ArrayList<File>(Arrays.asList(directory.listFiles()));
+		} else {
+			System.err.println("Pictures was not a directory");
+		}
+
+		// attempt to load up the default category file
+		getCategoryList("cats.txt");
+	}
+	
+	/**
+	 * Retrieves the list of categories in the organizer.
+	 * @return the list of categories currently loaded
+	 */
+	public ArrayList<String> getCategoryList(){
+		return this.categoryList;
 	}
 
 	/**
@@ -50,21 +75,17 @@ public class OrganizerModel {
 		if( newCategoryList.getName().endsWith(".txt") ){
 			categoryList.clear();
 
-			try{
-				FileInputStream fstream = new FileInputStream(cList);
-				DataInputStream in = new DataInputStream(fstream);
-				BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			try(BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream(cList))))){
 				String strLine;
 				//Read line by line
 				while((strLine = br.readLine()) != null){
 					categoryList.add(strLine);
 					startingNumbers.add(new Integer(0));
 				}
-				//close the output stream
-				in.close();
-
-			} catch(Exception e){
-				System.err.println("Error: there was a problem reading the file");
+			} catch (FileNotFoundException e) {
+				System.err.println("File not found");
+			} catch (IOException e) {
+				System.err.println("An exception occured");
 			}
 		} else if( newCategoryList.isDirectory() ){
 			File[] files_directories = newCategoryList.listFiles();
@@ -96,10 +117,9 @@ public class OrganizerModel {
 	 * 
 	 * @param dir - the directory with images.
 	 */
-	public void getFileList(String dir){
-		File newDirectory = new File(dir);
-		if(newDirectory.isDirectory()){
-			File[] files_directories = newDirectory.listFiles();
+	public void getFileList(File dir){
+		if(dir.isDirectory()){
+			File[] files_directories = dir.listFiles();
 			fileList.clear();
 			//filter by file name
 			for(int i = 0; i < files_directories.length; i++){
