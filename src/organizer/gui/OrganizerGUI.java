@@ -9,15 +9,30 @@ import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 
 import java.awt.*;
-
-public class OrganizerGUI extends JFrame {
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+/**
+ * The GUI for the organizer.
+ * 
+ * @author YottaGuy
+ * @author Josaphat Valdivia - josaphat.valdivia@gmail.com
+ *
+ */
+@SuppressWarnings("serial")
+public class OrganizerGUI extends JFrame implements ActionListener {
 	
 	final static int EAST_SIZE = 200;
 	final static int SOUTH_SIZE = 300;
 	
-	public OrganizerGUI(){
-		
-		setTitle("WallpaperOrganizer");
+	OrganizerModel model;
+	JLabel image;
+	
+	/**
+	 * Constructs the GUI for the Wallpaper Organizer.
+	 */
+	public OrganizerGUI(OrganizerModel model){
+		this.model = model;
+		setTitle("Wallpaper Organizer");
 		setExtendedState(JFrame.MAXIMIZED_BOTH); // full-screen
 	    setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -28,51 +43,60 @@ public class OrganizerGUI extends JFrame {
 	    //////////////////////////////////////////////////////////////////////
 	    
 	    JPanel east_p = new JPanel(new BorderLayout());
-	    
+
 		    //////////////////////////////////////////////////////////////////////
 		    // Category Panel - EAST: NORTH
 		    //////////////////////////////////////////////////////////////////////
-	    
+
 	    east_p.add(new JLabel("Categories:"), BorderLayout.NORTH);
 	    
 		    //////////////////////////////////////////////////////////////////////
 		    // Category Panel - EAST: CENTER
 		    //////////////////////////////////////////////////////////////////////
-	    
+
 	    //create the JList
-	    String[] initialList = {"This","Is","Where","Categories","Go"};
+	    String[] initialList = {"This", "Is", "Where", "Categories", "Go"};
+	    // TODO: Read categories from data.dat
 	    JList<String> listContainer = new JList<String>(initialList);
 	    listContainer.setFixedCellWidth(EAST_SIZE);
 	    listContainer.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	    
+
 	    east_p.add(listContainer, BorderLayout.CENTER);
-	    
+
 		    //////////////////////////////////////////////////////////////////////
 		    // Category Panel - EAST: SOUTH
 		    //////////////////////////////////////////////////////////////////////
-	    
+
 	    JButton new_button = new JButton("New");
+	    new_button.addActionListener(this);
 	    JButton delete_button = new JButton("Delete");
-	    
+	    delete_button.addActionListener(this);
+
 	    JPanel categoryOption_p = new JPanel(new GridLayout(1,2));
 	    categoryOption_p.add(new_button);
 	    categoryOption_p.add(delete_button);
-	    
+
 	    east_p.add(categoryOption_p, BorderLayout.SOUTH);
-	    
+
 	    main_p.add(east_p, BorderLayout.EAST);
-	    
+
 	    //////////////////////////////////////////////////////////////////////
 	    // Button Panel - NORTH
 	    //////////////////////////////////////////////////////////////////////
 	    
 	    //create buttons
 	    JButton save_button = new JButton("Save Cat List");
+	    save_button.addActionListener(this);
 	    JButton open_button = new JButton("Open Folder");
+	    open_button.addActionListener(this);
 	    JButton category_button = new JButton("Open Cat List");
+	    category_button.addActionListener(this);
 	    JButton apply_button = new JButton("Apply Changes");
+	    apply_button.addActionListener(this);
 	    JButton quit_button = new JButton("Quit");
+	    quit_button.addActionListener(this);
 	    JButton setFolder_button = new JButton("Set Folder");
+	    setFolder_button.addActionListener(this);
 	    
 	    JPanel button_p = new JPanel(new GridLayout(1,6));
 	    button_p.add(open_button);
@@ -100,9 +124,13 @@ public class OrganizerGUI extends JFrame {
 	    JPanel navigation_p = new JPanel(new GridLayout(1,4));
 	    //navigation buttons
 	    JButton first = new JButton("<<");
+	    first.addActionListener(this);
 	    JButton left = new JButton("<");
+	    left.addActionListener(this);
 	    JButton right = new JButton(">");
+	    right.addActionListener(this);
 	    JButton last = new JButton(">>");
+	    last.addActionListener(this);
 	    
 	    navigation_p.add(first);
 	    navigation_p.add(left);
@@ -115,13 +143,10 @@ public class OrganizerGUI extends JFrame {
 		    // Image Display - CENTER: CENTER
 		    //////////////////////////////////////////////////////////////////////
 	    
-	    JLabel image = new JLabel();
 	    //image.setIcon(new ImageIcon("C:\\Users\\Dren Shcatten\\Pictures\\Backgrounds\\Other\\Zelda\\0005-1290393897735.jpg"));
-	    //image.setIcon(new ImageIcon("C:\\Users\\Dren Shcatten\\Pictures\\Backgrounds\\Other\\Zelda\\0006-1290394504600.png"));
-	    
+	    //image.setIcon(new ImageIcon("C:\\Users\\Dren Shcatten\\Pictures\\Backgrounds\\Other\\Zelda\\0006-1290394504600.png"));	    
 	    //ImageIcon img = new ImageIcon(getResizedImage("C:\\Users\\Dren Shcatten\\Pictures\\Backgrounds\\Other\\Zelda\\0005-1290393897735.jpg"));
-	    ImageIcon img = new ImageIcon(getResizedImage("C:\\Users\\Dren Shcatten\\Pictures\\Backgrounds\\Other\\Zelda\\0006-1290394504600.png"));
-	    image.setIcon(img);
+	    this.image = new JLabel(new ImageIcon(getResizedImage("C:\\Users\\Dren Shcatten\\Pictures\\Backgrounds\\Other\\Zelda\\0006-1290394504600.png")));
 	    center_p.add(image, BorderLayout.CENTER);
 	    
 	    main_p.add(center_p, BorderLayout.CENTER);
@@ -139,9 +164,41 @@ public class OrganizerGUI extends JFrame {
 		
 		return scaled_img;
 	}
-	
-	public static void main(String[] args){
-		OrganizerGUI orgGUI = new OrganizerGUI();
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		String buttonText = ((JButton) e.getSource()).getText();
+
+		if (buttonText.equals("<")){
+			System.out.println("<");
+		} else if (buttonText.equals("<<")){
+			System.out.println("<<");
+		} else if (buttonText.equals(">>")){
+			System.out.println(">>");
+		} else if (buttonText.equals(">")){
+			System.out.println(">");
+		} else if (buttonText.equals("Open Folder")){
+			System.out.println("Open Folder");
+		} else if (buttonText.equals("Set Folder")){
+			System.out.println("Set Folder");
+		} else if (buttonText.equals("Open Cat List")){
+			System.out.println("Open Cat");
+		} else if (buttonText.equals("Save Cat List")){
+			System.out.println("Save Cat");
+		} else if (buttonText.equals("Apply Changes")){
+			System.out.println("Apply Changes");
+		} else if (buttonText.equals("New")){
+			System.out.println("New");
+		} else if (buttonText.equals("Delete")){
+			System.out.println("Delete");
+		} else if (buttonText.equals("Quit")){
+			System.out.println("Quit");
+		}
 	}
 	
+	public static void main(String[] args) {
+		/* Open the user's pictures folder the first image in the directory */
+		OrganizerModel organizer = new OrganizerModel();
+		OrganizerGUI orgGUI = new OrganizerGUI(organizer);
+	}
 }
