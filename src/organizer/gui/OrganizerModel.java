@@ -220,7 +220,7 @@ public class OrganizerModel {
 		for( int i = 0 ; i < fileList.size() ; i++ ){
 			if( categoryPairs[i] != null ){
 				int temp = startingNumbers.get(i).intValue();
-				String formattedNum = String.format("%04", temp);
+				String formattedNum = String.format("04", temp);
 				if( fileList.get(i).renameTo(new File(directoryOut,categoryPairs[i]
 						+" "+formattedNum))){
 					startingNumbers.set(i, new Integer(temp+1));
