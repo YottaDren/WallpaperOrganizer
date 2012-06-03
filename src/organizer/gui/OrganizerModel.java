@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -11,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import javax.swing.ImageIcon;
 
 /**
  * A simple image organizer.
@@ -20,6 +23,8 @@ import java.util.Arrays;
  */
 public class OrganizerModel {
 
+	public int FIRST;
+	public int LAST;
 	// List of files in the current directory
 	private ArrayList<File> fileList = new ArrayList<File>();
 	// List of categories (also folders)
@@ -35,23 +40,50 @@ public class OrganizerModel {
 	// which file in the file list
 	int place = 0;
 	
+	// Keeping track of the image we're working with.
+	int index;
+	
 	/**
 	 * Build the model and initialize it to the user's pictures directory
 	 */
 	public OrganizerModel() {
+		this.FIRST = 0;
 		directory = new File(System.getProperty("user.home")
 				+ System.getProperty("file.separator")
 				+ "Pictures"
 			);
 		// Populate the file list
-		if(directory.isDirectory()){
-			fileList = new ArrayList<File>(Arrays.asList(directory.listFiles()));
-		} else {
-			System.err.println("Pictures was not a directory");
-		}
-
+		updateFileList();
 		// attempt to load up the default category file
 		getCategoryList("cats.txt");
+	}
+	
+	/**
+	 * Updates the file list to the (relevant) contents of the directory
+	 */
+	private void updateFileList(){
+		this.fileList = new ArrayList<File>(Arrays.asList(this.directory.listFiles(new FileFilter(){
+
+			@Override
+			public boolean accept(File f) {
+				String s = f.getName();
+				if(f.isFile()){
+					s = s.toLowerCase();
+					if(s.endsWith(".tiff") ||
+							s.endsWith(".tif") ||
+							s.endsWith(".jpeg") ||
+							s.endsWith(".jpg") ||
+							s.endsWith(".gif") ||
+							s.endsWith(".png")){
+						return true;
+					}
+				}
+				return false;
+			}
+			
+		})));
+		index = 0;
+		LAST = this.fileList.size() - 1;
 	}
 	
 	/**
@@ -290,6 +322,45 @@ public class OrganizerModel {
 	}
 
 	public void setCurrentDir(File dir) {
-		this.directory = dir;
+		if(dir.isDirectory()){
+			this.directory = dir;
+			updateFileList();
+		}
+	}
+	
+	public ImageIcon getFirstImageIcon(){
+		this.index = 0;
+		return getImageIconAt(this.index);
+	}
+	
+	public ImageIcon getPreviousImageIcon(){
+		if(index < 1){
+			index = 0;
+		} else {
+			--index;
+		}
+		return getImageIconAt(index);
+	}
+
+	public ImageIcon getNextImageIcon() {
+		if(index > fileList.size() - 2){
+			index = fileList.size() - 1;
+		} else {
+			++index;
+		}
+		return getImageIconAt(index);
+	}
+	
+	public ImageIcon getLastImageIcon() {
+		index = this.fileList.size()-1;
+		return getImageIconAt(index);
+	}
+	
+	public ImageIcon getImageIconAt(int i){
+		if(i >= 0 && i < fileList.size()){
+			return new ImageIcon(this.fileList.get(i).getAbsolutePath());
+		} else {
+			return null;
+		}
 	}
 }

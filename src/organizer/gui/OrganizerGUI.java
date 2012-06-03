@@ -9,6 +9,10 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -27,10 +31,19 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 	final static int EAST_SIZE = 200;
 	final static int SOUTH_SIZE = 300;
 	
+	private final static int FIRST = Integer.MIN_VALUE;
+	private final static int PREVIOUS = -1;
+	private final static int NEXT = 1;
+	private final static int LAST = Integer.MAX_VALUE;
+	
 	OrganizerModel model;
 	JLabel image;
 	JLabel curDirLabel;
 	JFileChooser fc;
+	JList<String> listContainer;
+	JButton delete_button,
+	first_button,previous_button,
+	next_button,last_button;
 	
 	/**
 	 * Constructs the GUI for the Wallpaper Organizer.
@@ -39,6 +52,7 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 		this.model = model;
 		this.fc = new JFileChooser(this.model.getCurrentDir());
 		this.fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		curDirLabel = new JLabel(model.getCurrentDir().getName());
 		setTitle("Wallpaper Organizer");
 		setExtendedState(JFrame.MAXIMIZED_BOTH); // full-screen
 	    setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -54,7 +68,7 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 		    //////////////////////////////////////////////////////////////////////
 		    // Category Panel - EAST: NORTH
 		    //////////////////////////////////////////////////////////////////////
-
+	    
 	    east_p.add(new JLabel("Categories:"), BorderLayout.NORTH);
 	    
 		    //////////////////////////////////////////////////////////////////////
@@ -62,7 +76,6 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 		    //////////////////////////////////////////////////////////////////////
 
 	    // create the JList
-	    // TODO: Make this prettier
 	    DefaultListModel<String> listModel = new DefaultListModel<String>();
 	    if(model.getCategoryList().isEmpty()){
 	    	String[] initialList = {"This", "Is", "Where", "Categories", "Go"};
@@ -74,9 +87,23 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 	    		listModel.addElement(s);
 	    	}
 	    }
-	    JList<String> listContainer = new JList<String>(listModel);
+	    listContainer = new JList<String>(listModel);
 	    listContainer.setFixedCellWidth(EAST_SIZE);
 	    listContainer.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	    listContainer.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				/* If there isn't anything selected in the list, don't let the user
+				 * click the delete button.
+				 */
+				ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+				if(lsm.isSelectionEmpty()){
+					delete_button.setEnabled(false);
+				} else {
+					delete_button.setEnabled(true);
+				}
+			}
+	    });
 
 	    east_p.add(listContainer, BorderLayout.CENTER);
 
@@ -86,7 +113,8 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 
 	    JButton new_button = new JButton("New");
 	    new_button.addActionListener(this);
-	    JButton delete_button = new JButton("Delete");
+	    delete_button = new JButton("Delete");
+	    delete_button.setEnabled(false);
 	    delete_button.addActionListener(this);
 
 	    JPanel categoryOption_p = new JPanel(new GridLayout(1,2));
@@ -138,21 +166,27 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 		    // Image Display - CENTER: TOP
 		    //////////////////////////////////////////////////////////////////////	    
 
-	    JPanel navigation_p = new JPanel(new GridLayout(1,4));
+	    JPanel navigation_p = new JPanel(new GridLayout(2,4));
 	    //navigation buttons
-	    JButton first = new JButton("<<");
-	    first.addActionListener(this);
-	    JButton left = new JButton("<");
-	    left.addActionListener(this);
-	    JButton right = new JButton(">");
-	    right.addActionListener(this);
-	    JButton last = new JButton(">>");
-	    last.addActionListener(this);
+	    first_button = new JButton("<<");
+	    first_button.addActionListener(this);
+	    first_button.setEnabled(false);
+	    previous_button = new JButton("<");
+	    previous_button.addActionListener(this);
+	    previous_button.setEnabled(false);
+	    next_button = new JButton(">");
+	    next_button.addActionListener(this);
+	    last_button = new JButton(">>");
+	    last_button.addActionListener(this);
 	    
-	    navigation_p.add(first);
-	    navigation_p.add(left);
-	    navigation_p.add(right);
-	    navigation_p.add(last);
+	    navigation_p.add(this.curDirLabel); // Show the working directory
+	    navigation_p.add(new JLabel("")); // add some blanks
+	    navigation_p.add(new JLabel(""));
+	    navigation_p.add(new JLabel(""));
+	    navigation_p.add(first_button);
+	    navigation_p.add(previous_button);
+	    navigation_p.add(next_button);
+	    navigation_p.add(last_button);
 	    
 	    center_p.add(navigation_p, BorderLayout.NORTH);
 	    
@@ -163,7 +197,11 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 	    //image.setIcon(new ImageIcon("C:\\Users\\Dren Shcatten\\Pictures\\Backgrounds\\Other\\Zelda\\0005-1290393897735.jpg"));
 	    //image.setIcon(new ImageIcon("C:\\Users\\Dren Shcatten\\Pictures\\Backgrounds\\Other\\Zelda\\0006-1290394504600.png"));	    
 	    //ImageIcon img = new ImageIcon(getResizedImage("C:\\Users\\Dren Shcatten\\Pictures\\Backgrounds\\Other\\Zelda\\0005-1290393897735.jpg"));
-	    this.image = new JLabel(new ImageIcon(getResizedImage("C:\\Users\\Dren Shcatten\\Pictures\\Backgrounds\\Other\\Zelda\\0006-1290394504600.png")));
+	    //this.image = new JLabel(new ImageIcon(getResizedImage("C:\\Users\\Dren Shcatten\\Pictures\\Backgrounds\\Other\\Zelda\\0006-1290394504600.png")));
+	    this.image = new JLabel();
+	    this.image.setIcon(scale(model.getFirstImageIcon()));
+	    this.image.setAlignmentX(CENTER_ALIGNMENT);
+	    //this.image = new JLabel(scale(new ImageIcon("C:\\Users\\panchovaldiv\\Pictures\\Scan.png")));
 	    center_p.add(image, BorderLayout.CENTER);
 	    
 	    main_p.add(center_p, BorderLayout.CENTER);
@@ -171,6 +209,49 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 	    add(main_p);
 	    setVisible(true);
 	    
+	}
+	
+	/**
+	 * Scale the given image to fit on the screen.
+	 * TODO: maintain the aspect ratio
+	 * @param img
+	 * @return
+	 */
+	private ImageIcon scale(ImageIcon img){
+		int height, width;
+		java.awt.Dimension d = this.getSize();
+		if(d.height < d.width){
+			height = d.height;
+			width = -1;
+		} else if(d.width < d.height) {
+			height = -1;
+			width = d.width;
+		} else {
+			width = -1;
+			height = -1;
+		}
+		if(img == null){
+			return null;
+		} else {
+			return new ImageIcon(img.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
+		}
+	}
+	
+	private void updateImage(int what){
+		switch(what){
+		case FIRST:
+			this.image.setIcon(scale(model.getFirstImageIcon()));
+			break;
+		case PREVIOUS:
+			this.image.setIcon(scale(model.getPreviousImageIcon()));
+			break;
+		case NEXT:
+			this.image.setIcon(scale(model.getNextImageIcon()));
+			break;
+		case LAST:
+			this.image.setIcon(scale(model.getLastImageIcon()));
+			break;
+		}
 	}
 
 	public static Image getResizedImage(String location){
@@ -187,18 +268,19 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 		String buttonText = ((JButton) e.getSource()).getText();
 
 		if (buttonText.equals("<")){
-			System.out.println("<");
+			updateImage(PREVIOUS);
 		} else if (buttonText.equals("<<")){
-			System.out.println("<<");
+			updateImage(FIRST);
 		} else if (buttonText.equals(">>")){
-			System.out.println(">>");
+			updateImage(LAST);
 		} else if (buttonText.equals(">")){
-			System.out.println(">");
+			updateImage(NEXT);
 		} else if (buttonText.equals("Open Folder")){
 			int retval = this.fc.showOpenDialog(this);
 			if(retval == JFileChooser.APPROVE_OPTION){
 				model.setCurrentDir(fc.getSelectedFile());
 				this.curDirLabel.setText(model.getCurrentDir().toString());
+				updateImage(FIRST);
 			}
 		} else if (buttonText.equals("Set Folder")){
 			System.out.println("Set Folder");
@@ -212,8 +294,31 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 			System.out.println("New");
 		} else if (buttonText.equals("Delete")){
 			System.out.println("Delete");
-		} else if (buttonText.equals("Quit")){
+		}
+		else if (buttonText.equals("Quit")){
 			this.close();
+		}
+		
+		if(model.index == model.LAST && model.index != 0){
+			first_button.setEnabled(true);
+			previous_button.setEnabled(true);
+			next_button.setEnabled(false);
+			last_button.setEnabled(false);
+		} else if (model.index == model.FIRST && model.LAST != 0) {
+			first_button.setEnabled(false);
+			previous_button.setEnabled(false);
+			next_button.setEnabled(true);
+			last_button.setEnabled(true);
+		} else if (model.LAST == 0 ){
+			first_button.setEnabled(false);
+			previous_button.setEnabled(false);
+			next_button.setEnabled(false);
+			last_button.setEnabled(false);
+		} else {
+			first_button.setEnabled(true);
+			previous_button.setEnabled(true);
+			next_button.setEnabled(true);
+			last_button.setEnabled(true);
 		}
 	}
 	
