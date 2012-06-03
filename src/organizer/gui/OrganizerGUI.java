@@ -21,7 +21,7 @@ import java.awt.event.ActionListener;
 /**
  * The GUI for the organizer.
  * 
- * @author YottaGuy
+ * @author Ricardo Quintanilla - rpq5136@gmail.com
  * @author Josaphat Valdivia - josaphat.valdivia@gmail.com
  *
  */
@@ -44,12 +44,13 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 	JButton delete_button,
 	first_button,previous_button,
 	next_button,last_button;
+	DefaultListModel<String> listModel;
 	
 	/**
 	 * Constructs the GUI for the Wallpaper Organizer.
 	 */
-	public OrganizerGUI(OrganizerModel model){
-		this.model = model;
+	public OrganizerGUI(OrganizerModel m){
+		this.model = m;
 		this.fc = new JFileChooser(this.model.getCurrentDir());
 		this.fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		curDirLabel = new JLabel(model.getCurrentDir().getName());
@@ -76,7 +77,7 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 		    //////////////////////////////////////////////////////////////////////
 
 	    // create the JList
-	    DefaultListModel<String> listModel = new DefaultListModel<String>();
+	    listModel = new DefaultListModel<String>();
 	    if(model.getCategoryList().isEmpty()){
 	    	String[] initialList = {"This", "Is", "Where", "Categories", "Go"};
 	    	for(String s : initialList){
@@ -99,8 +100,10 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 				ListSelectionModel lsm = (ListSelectionModel)e.getSource();
 				if(lsm.isSelectionEmpty()){
 					delete_button.setEnabled(false);
+					model.setCurrentPair(null);
 				} else {
 					delete_button.setEnabled(true);
+					model.setCurrentPair(listContainer.getSelectedValue());
 				}
 			}
 	    });
@@ -269,12 +272,36 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 
 		if (buttonText.equals("<")){
 			updateImage(PREVIOUS);
+			//TODO display categoryList entry for current
+			if(model.getPairAt(model.getIndex()) != null){
+				this.listContainer.setSelectedIndex(model.getCategoryList().indexOf(model.getPairAt(model.getIndex())));
+			} else {
+				this.listContainer.clearSelection();
+			}
 		} else if (buttonText.equals("<<")){
 			updateImage(FIRST);
+			// display categoryList entry for current
+			if(model.getPairAt(model.getIndex()) != null){
+				this.listContainer.setSelectedIndex(model.getCategoryList().indexOf(model.getPairAt(model.getIndex())));
+			} else {
+				this.listContainer.clearSelection();
+			}
 		} else if (buttonText.equals(">>")){
 			updateImage(LAST);
+			// display categoryList entry for current
+			if(model.getPairAt(model.getIndex()) != null){
+				this.listContainer.setSelectedIndex(model.getCategoryList().indexOf(model.getPairAt(model.getIndex())));
+			} else {
+				this.listContainer.clearSelection();
+			}
 		} else if (buttonText.equals(">")){
 			updateImage(NEXT);
+			// display categoryList entry for current
+			if(model.getPairAt(model.getIndex()) != null){
+				this.listContainer.setSelectedIndex(model.getCategoryList().indexOf(model.getPairAt(model.getIndex())));
+			} else {
+				this.listContainer.clearSelection();
+			}
 		} else if (buttonText.equals("Open Folder")){
 			int retval = this.fc.showOpenDialog(this);
 			if(retval == JFileChooser.APPROVE_OPTION){
@@ -284,10 +311,32 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 			}
 		} else if (buttonText.equals("Set Folder")){
 			System.out.println("Set Folder");
+			JFileChooser chooser = new JFileChooser();
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			int returnVal = chooser.showOpenDialog(this);
+			if(returnVal == JFileChooser.APPROVE_OPTION){
+				model.setDirectoryOut(chooser.getSelectedFile());
+			}
 		} else if (buttonText.equals("Open Cat List")){
 			System.out.println("Open Cat");
+			JFileChooser chooser = new JFileChooser();
+			chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			int returnVal = chooser.showOpenDialog(this);
+			if(returnVal == JFileChooser.APPROVE_OPTION){
+				model.populateCategoryList(chooser.getSelectedFile().getAbsolutePath());
+			}
+			listModel.clear();
+			for( int i = 0 ; i < model.getCategoryList().size() ; i++ ){
+				listModel.addElement(model.getCategoryList().get(i));
+			}
 		} else if (buttonText.equals("Save Cat List")){
 			System.out.println("Save Cat");
+			JFileChooser chooser = new JFileChooser();
+			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			int returnVal = chooser.showOpenDialog(this);
+			if(returnVal == JFileChooser.APPROVE_OPTION){
+				model.writeCategoryList(chooser.getSelectedFile().getAbsolutePath());
+			}
 		} else if (buttonText.equals("Apply Changes")){
 			System.out.println("Apply Changes");
 		} else if (buttonText.equals("New")){
@@ -299,12 +348,12 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 			this.close();
 		}
 		
-		if(model.index == model.LAST && model.index != 0){
+		if((model.index == model.LAST) && (model.index != 0)){
 			first_button.setEnabled(true);
 			previous_button.setEnabled(true);
 			next_button.setEnabled(false);
 			last_button.setEnabled(false);
-		} else if (model.index == model.FIRST && model.LAST != 0) {
+		} else if ((model.index == model.FIRST) && (model.LAST != 0)) {
 			first_button.setEnabled(false);
 			previous_button.setEnabled(false);
 			next_button.setEnabled(true);

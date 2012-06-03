@@ -35,13 +35,12 @@ public class OrganizerModel {
 	private File directory;
 	// Where all the files will be renamed and copied to.
 	private File directoryOut;
+
 	// What category is chosen for that file
 	private String[] categoryPairs;
-	// which file in the file list
-	int place = 0;
 	
-	// Keeping track of the image we're working with.
-	int index;
+	// Keeping track of the current file
+	int index = 0;
 	
 	/**
 	 * Build the model and initialize it to the user's pictures directory
@@ -55,35 +54,7 @@ public class OrganizerModel {
 		// Populate the file list
 		updateFileList();
 		// attempt to load up the default category file
-		getCategoryList("cats.txt");
-	}
-	
-	/**
-	 * Updates the file list to the (relevant) contents of the directory
-	 */
-	private void updateFileList(){
-		this.fileList = new ArrayList<File>(Arrays.asList(this.directory.listFiles(new FileFilter(){
-
-			@Override
-			public boolean accept(File f) {
-				String s = f.getName();
-				if(f.isFile()){
-					s = s.toLowerCase();
-					if(s.endsWith(".tiff") ||
-							s.endsWith(".tif") ||
-							s.endsWith(".jpeg") ||
-							s.endsWith(".jpg") ||
-							s.endsWith(".gif") ||
-							s.endsWith(".png")){
-						return true;
-					}
-				}
-				return false;
-			}
-			
-		})));
-		index = 0;
-		LAST = this.fileList.size() - 1;
+		populateCategoryList("cats.txt");
 	}
 	
 	/**
@@ -102,7 +73,7 @@ public class OrganizerModel {
 	 *  
 	 * @param cList - The address of a text file or directory containing categories
 	 */
-	public void getCategoryList(String cList){
+	public void populateCategoryList(String cList){
 		File newCategoryList = new File(cList);
 		if( newCategoryList.getName().endsWith(".txt") ){
 			categoryList.clear();
@@ -147,11 +118,11 @@ public class OrganizerModel {
 	/**
 	 * Retrieves a list of image files from the given directory.
 	 * 
-	 * @param dir - the directory with images.
+	 * @param directory - the directory with images.
 	 */
-	public void getFileList(File dir){
-		if(dir.isDirectory()){
-			File[] files_directories = dir.listFiles();
+	public void updateFileList(){
+		if(directory.isDirectory()){
+			File[] files_directories = directory.listFiles();
 			fileList.clear();
 			//filter by file name
 			for(int i = 0; i < files_directories.length; i++){
@@ -162,6 +133,8 @@ public class OrganizerModel {
 					fileList.add(files_directories[i]);
 				}
 			}
+			index = 0;
+			LAST = this.fileList.size() - 1;
 			categoryPairs = new String[fileList.size()];
 		} else {
 			System.out.print("not a directory");
@@ -263,11 +236,11 @@ public class OrganizerModel {
 	 * @return File - the first file of the file list or null
 	 */
 	public File first(){
-		place = 0;
+		index = 0;
 		if(fileList.isEmpty()){
 			return null;
 		} else {
-			return fileList.get(place);
+			return fileList.get(index);
 		}
 	}
 
@@ -278,12 +251,12 @@ public class OrganizerModel {
 	 * @return File - the previous File in the file list or null
 	 */
 	public File left(){
-		if((place-1) >= 0)
-			place--;
+		if((index-1) >= 0)
+			index--;
 		if(fileList.isEmpty()){
 			return null;
 		} else {
-			return fileList.get(place);
+			return fileList.get(index);
 		}
 	}
 
@@ -294,12 +267,12 @@ public class OrganizerModel {
 	 * @return File - the next file in the file list or null
 	 */
 	public File right(){
-		if((place+1) < fileList.size())
-			place++;
+		if((index+1) < fileList.size())
+			index++;
 		if(fileList.isEmpty()){
 			return null;
 		} else {
-			return fileList.get(place);
+			return fileList.get(index);
 		}
 	}
 
@@ -309,11 +282,11 @@ public class OrganizerModel {
 	 * @return File - last file in the file list or null
 	 */
 	public File last(){
-		place = fileList.size() - 1;
+		index = fileList.size() - 1;
 		if(fileList.isEmpty()){
 			return null;
 		} else {
-			return fileList.get(place);
+			return fileList.get(index);
 		}
 	}
 
@@ -362,5 +335,34 @@ public class OrganizerModel {
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * @return the directoryOut
+	 */
+	public File getDirectoryOut() {
+		return directoryOut;
+	}
+
+	/**
+	 * @param directoryOut the directoryOut to set
+	 */
+	public void setDirectoryOut(File directoryOut) {
+		this.directoryOut = directoryOut;
+	}
+	
+	/**
+	 * @return the current place
+	 */
+	public int getIndex(){
+		return index;
+	}
+	
+	public String getPairAt(int index){
+		return this.categoryPairs[index];
+	}
+	
+	public void setCurrentPair(String category){
+		this.categoryPairs[index]= category;
 	}
 }
