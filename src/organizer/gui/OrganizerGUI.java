@@ -9,8 +9,16 @@ import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 
 import java.awt.*;
-
-public class OrganizerGUI extends JFrame {
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+/**
+ * The GUI for the organizer.
+ * 
+ * @author YottaGuy
+ * @author Josaphat Valdivia - josaphat.valdivia@gmail.com
+ *
+ */
+public class OrganizerGUI extends JFrame implements ActionListener {
 	
 	final static int EAST_SIZE = 200;
 	final static int SOUTH_SIZE = 300;
@@ -52,7 +60,9 @@ public class OrganizerGUI extends JFrame {
 		    //////////////////////////////////////////////////////////////////////
 	    
 	    JButton new_button = new JButton("New");
+	    new_button.addActionListener(this);
 	    JButton delete_button = new JButton("Delete");
+	    delete_button.addActionListener(this);
 	    
 	    JPanel categoryOption_p = new JPanel(new GridLayout(1,2));
 	    categoryOption_p.add(new_button);
@@ -68,11 +78,17 @@ public class OrganizerGUI extends JFrame {
 	    
 	    //create buttons
 	    JButton save_button = new JButton("Save Cat List");
+	    save_button.addActionListener(this);
 	    JButton open_button = new JButton("Open Folder");
+	    open_button.addActionListener(this);
 	    JButton category_button = new JButton("Open Cat List");
+	    category_button.addActionListener(this);
 	    JButton apply_button = new JButton("Apply Changes");
+	    apply_button.addActionListener(this);
 	    JButton quit_button = new JButton("Quit");
+	    quit_button.addActionListener(this);
 	    JButton setFolder_button = new JButton("Set Folder");
+	    setFolder_button.addActionListener(this);
 	    
 	    JPanel button_p = new JPanel(new GridLayout(1,6));
 	    button_p.add(open_button);
@@ -100,9 +116,13 @@ public class OrganizerGUI extends JFrame {
 	    JPanel navigation_p = new JPanel(new GridLayout(1,4));
 	    //navigation buttons
 	    JButton first = new JButton("<<");
+	    first.addActionListener(this);
 	    JButton left = new JButton("<");
+	    left.addActionListener(this);
 	    JButton right = new JButton(">");
+	    right.addActionListener(this);
 	    JButton last = new JButton(">>");
+	    last.addActionListener(this);
 	    
 	    navigation_p.add(first);
 	    navigation_p.add(left);
@@ -143,5 +163,36 @@ public class OrganizerGUI extends JFrame {
 	public static void main(String[] args){
 		OrganizerGUI orgGUI = new OrganizerGUI();
 	}
-	
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		String buttonText = ((JButton) e.getSource()).getText();
+		
+		if (buttonText.equals("<")){
+			System.out.println("< pushed");
+		} else if (buttonText.equals("<<")){
+			System.out.println("<< pushed");
+		} else if (buttonText.equals(">>")){
+			System.out.println(">> pushed");
+		} else if (buttonText.equals(">")){
+			System.out.println("> pushed");
+		} else if (buttonText.equals("Open Folder")){
+			System.out.println("Open Folder pushed");
+		} else if (buttonText.equals("Set Folder")){
+			System.out.println("Set Folder");
+		} else if (buttonText.equals("Open Cat List")){
+			System.out.println("Open Cat List pushed");
+		} else if (buttonText.equals("Save Cat List")){
+			System.out.println("Save Cat List pushed");
+		} else if (buttonText.equals("Apply Changes")){
+			System.out.println("Apply Changes pushed");
+		} else if (buttonText.equals("New")){
+			System.out.println("New pushed");
+		} else if (buttonText.equals("Delete")){
+			System.out.println("Delete pushed");
+		} else if (buttonText.equals("Quit")){
+			System.out.println("Quit pushed");
+		}
+		
+	}
 }

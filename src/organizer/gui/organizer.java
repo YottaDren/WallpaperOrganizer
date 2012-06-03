@@ -1,4 +1,5 @@
 package organizer.gui;
+
 /**
  * A simple image organizer.
  * 
@@ -37,7 +38,6 @@ public class organizer {
 		if( newCategoryList.getName().endsWith(".txt") ){
 			categoryList.clear();
 			
-			//http://www.roseindia.net/java/beginners/java-read-file-line-by-line.shtml
 			try{
 				FileInputStream fstream = new FileInputStream(cList);
 				DataInputStream in = new DataInputStream(fstream);
