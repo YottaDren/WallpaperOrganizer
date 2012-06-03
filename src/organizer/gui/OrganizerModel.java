@@ -15,16 +15,28 @@ import java.util.Vector;
  * @author Ricardo Quintanilla - rpq5136@rit.edu
  * @author Josaphat Valdivia - josaphat.valdivia@gmail.com
  */
-public class organizer {
+public class OrganizerModel {
 
-	static Vector<File> fileList = new Vector<File>();
-	static Vector<String> categoryList = new Vector<String>(); 
-	static Vector<Integer> startingNumbers = new Vector<Integer>();
-	static File directory;
-	static File directoryOut;
-	static String[] categoryPairs;
-	static int place = 0;
+	Vector<File> fileList = new Vector<File>();
+	Vector<String> categoryList = new Vector<String>(); 
+	Vector<Integer> startingNumbers = new Vector<Integer>();
+	File directory;
+	File directoryOut;
+	String[] categoryPairs;
+	int place = 0;
 	
+	/**
+	 * Build the model and initialize it to the user's pictures directory
+	 */
+	public OrganizerModel() {
+		System.out.println("Inside OrganizerModel()");
+		directory = new File(System.getProperty("user.home")
+				+ System.getProperty("file.separator")
+				+ "Pictures"
+			);
+		
+	}
+
 	/**
 	 * Retrieves a list of categories. The cList can be either be the address
 	 * of a text file or a directory. If a text file, categories will be read
@@ -33,11 +45,11 @@ public class organizer {
 	 *  
 	 * @param cList - The address of a text file or directory containing categories
 	 */
-	public static void getCategoryList(String cList){
+	public void getCategoryList(String cList){
 		File newCategoryList = new File(cList);
 		if( newCategoryList.getName().endsWith(".txt") ){
 			categoryList.clear();
-			
+
 			try{
 				FileInputStream fstream = new FileInputStream(cList);
 				DataInputStream in = new DataInputStream(fstream);
@@ -50,7 +62,7 @@ public class organizer {
 				}
 				//close the output stream
 				in.close();
-				
+
 			} catch(Exception e){
 				System.err.println("Error: there was a problem reading the file");
 			}
@@ -68,23 +80,23 @@ public class organizer {
 			System.out.print("not a text file");
 		}
 	}
-	
+
 	/**
 	 * Prints the list of categories to standard out.
 	 */
-	public static void printCategoryList(){
+	public void printCategoryList(){
 		int size = categoryList.size();
 		for( int i = 0 ; i < size ; i++ ){
 			System.out.println(i+" "+categoryList.get(i));
 		}
 	}
-	
+
 	/**
 	 * Retrieves a list of image files from the given directory.
 	 * 
 	 * @param dir - the directory with images.
 	 */
-	public static void getFileList(String dir){
+	public void getFileList(String dir){
 		File newDirectory = new File(dir);
 		if(newDirectory.isDirectory()){
 			File[] files_directories = newDirectory.listFiles();
@@ -103,24 +115,24 @@ public class organizer {
 			System.out.print("not a directory");
 		}
 	}
-	
+
 	/**
 	 * Prints the list of files to standard output.
 	 */
-	public static void printFileList(){
+	public void printFileList(){
 		int size = fileList.size();
 		for( int i = 0 ; i < size ; i++ ){
 			System.out.println(i+" "+fileList.get(i).getName());
 		}
 	}
-	
+
 	/**
 	 * Writes the category list to a file. Overwrites if the file already
 	 * exists, creates a new file otherwise.
 	 * 
 	 * @param outputFile - the address of the file
 	 */
-	public static void writeCategoryList(String outputFile){
+	public void writeCategoryList(String outputFile){
 		//http://www.roseindia.net/java/beginners/java-write-to-file.shtml
 		try{
 			int size = categoryList.size();
@@ -128,7 +140,7 @@ public class organizer {
 			// Create file 
 			FileWriter fstream = new FileWriter(outputFile);
 			BufferedWriter out = new BufferedWriter(fstream);
-			
+
 			for( int i = 0 ; i < size ; i++ ){
 				out.write(categoryList.get(i)+"\n");
 				out.flush();
@@ -139,14 +151,14 @@ public class organizer {
 			System.err.println("Error: " + e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Retrieves the number to start a categories numbering.
 	 * 
 	 * @param dir - The category directory 
 	 * @return the number to start a categories numbering
 	 */
-	public static int retrieveNumber(String dir){
+	public int retrieveNumber(String dir){
 		File innerDirectory = new File(directoryOut.getAbsolutePath()+"\\"+dir);
 		int starting = 0;
 		if(innerDirectory.isDirectory()){
@@ -175,11 +187,11 @@ public class organizer {
 			return -1;
 		}
 	}
-	
+
 	/**
 	 * Copies all the files with a selected category to their category folder. 
 	 */
-	public static void applyChanges(){
+	public void applyChanges(){
 		for( int i = 0 ; i < fileList.size() ; i++ ){
 			if( categoryPairs[i] != null ){
 				int temp = startingNumbers.get(i).intValue();
@@ -191,14 +203,14 @@ public class organizer {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns to the beginning of the file list and moves to the first place
 	 * or returns null if empty.
 	 * 
 	 * @return File - the first file of the file list or null
 	 */
-	public static File first(){
+	public File first(){
 		place = 0;
 		if(fileList.isEmpty()){
 			return null;
@@ -206,14 +218,14 @@ public class organizer {
 			return fileList.get(place);
 		}
 	}
-	
+
 	/**
 	 * Returns the previous File in the file list and decrements the place.
 	 * Returns null if the file list if empty.
 	 * 
 	 * @return File - the previous File in the file list or null
 	 */
-	public static File left(){
+	public File left(){
 		if((place-1) >= 0)
 			place--;
 		if(fileList.isEmpty()){
@@ -222,14 +234,14 @@ public class organizer {
 			return fileList.get(place);
 		}
 	}
-	
+
 	/**
 	 * Returns the next File in the file list and decrements the place. Returns
 	 * null if the list is empty.
 	 * 
 	 * @return File - the next file in the file list or null
 	 */
-	public static File right(){
+	public File right(){
 		if((place+1) < fileList.size())
 			place++;
 		if(fileList.isEmpty()){
@@ -238,21 +250,18 @@ public class organizer {
 			return fileList.get(place);
 		}
 	}
-	
+
 	/**
 	 * Returns the last File in the file list and moves to the last place.
 	 * 
 	 * @return File - last file in the file list or null
 	 */
-	public static File last(){
+	public File last(){
 		place = fileList.size() - 1;
 		if(fileList.isEmpty()){
 			return null;
 		} else {
 			return fileList.get(place);
 		}
-	}
-	
-	public static void main(String[] args){
 	}
 }
