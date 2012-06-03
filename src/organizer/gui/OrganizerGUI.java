@@ -3,6 +3,7 @@ package organizer.gui;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -28,12 +29,16 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 	
 	OrganizerModel model;
 	JLabel image;
+	JLabel curDirLabel;
+	JFileChooser fc;
 	
 	/**
 	 * Constructs the GUI for the Wallpaper Organizer.
 	 */
 	public OrganizerGUI(OrganizerModel model){
 		this.model = model;
+		this.fc = new JFileChooser(this.model.getCurrentDir());
+		this.fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		setTitle("Wallpaper Organizer");
 		setExtendedState(JFrame.MAXIMIZED_BOTH); // full-screen
 	    setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -190,7 +195,11 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 		} else if (buttonText.equals(">")){
 			System.out.println(">");
 		} else if (buttonText.equals("Open Folder")){
-			System.out.println("Open Folder");
+			int retval = this.fc.showOpenDialog(this);
+			if(retval == JFileChooser.APPROVE_OPTION){
+				model.setCurrentDir(fc.getSelectedFile());
+				this.curDirLabel.setText(model.getCurrentDir().toString());
+			}
 		} else if (buttonText.equals("Set Folder")){
 			System.out.println("Set Folder");
 		} else if (buttonText.equals("Open Cat List")){
@@ -204,8 +213,14 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 		} else if (buttonText.equals("Delete")){
 			System.out.println("Delete");
 		} else if (buttonText.equals("Quit")){
-			System.out.println("Quit");
+			this.close();
 		}
+	}
+	
+	private void close(){
+		setVisible(false);
+		dispose();
+		System.exit(0);
 	}
 	
 	public static void main(String[] args) {

@@ -21,17 +21,17 @@ import java.util.Arrays;
 public class OrganizerModel {
 
 	// List of files in the current directory
-	ArrayList<File> fileList = new ArrayList<File>();
+	private ArrayList<File> fileList = new ArrayList<File>();
 	// List of categories (also folders)
-	ArrayList<String> categoryList = new ArrayList<String>();
+	private ArrayList<String> categoryList = new ArrayList<String>();
 	// Everything goes into a folder and gets the name in the folder plus a space
 	// plus a number
-	ArrayList<Integer> startingNumbers = new ArrayList<Integer>();
-	File directory;
-	// Where all the files will me renamed and copied to.
-	File directoryOut;
+	private ArrayList<Integer> startingNumbers = new ArrayList<Integer>();
+	private File directory;
+	// Where all the files will be renamed and copied to.
+	private File directoryOut;
 	// What category is chosen for that file
-	String[] categoryPairs;
+	private String[] categoryPairs;
 	// which file in the file list
 	int place = 0;
 	
@@ -283,5 +283,13 @@ public class OrganizerModel {
 		} else {
 			return fileList.get(place);
 		}
+	}
+
+	public File getCurrentDir() {
+		return this.directory;
+	}
+
+	public void setCurrentDir(File dir) {
+		this.directory = dir;
 	}
 }
