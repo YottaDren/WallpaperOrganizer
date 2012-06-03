@@ -1,0 +1,6 @@
+AND
+A
+ONE
+AND
+A
+TWO
