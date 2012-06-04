@@ -339,6 +339,7 @@ public class OrganizerGUI extends JFrame implements ActionListener {
 			}
 		} else if (buttonText.equals("Apply Changes")){
 			System.out.println("Apply Changes");
+			model.applyChanges();
 		} else if (buttonText.equals("New")){
 			System.out.println("New");
 		} else if (buttonText.equals("Delete")){
